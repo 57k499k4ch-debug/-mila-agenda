@@ -181,7 +181,7 @@ function renderSlots(){
 }
 document.querySelectorAll('.opt input').forEach(i=>i.onchange=()=>document.querySelectorAll('.opt').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked)));
 function waMila(){const wa=(CFG.contato.whatsapp||'').replace(/\D/g,'');if(!wa)return '';const nome=$('nome').value.trim(),ap=$('apelido').value.trim();
- const t=`Oi Mila! Tentei agendar pelo site e não achei um horário que sirva.\n${nome?'Nome: '+nome+(ap?' ('+ap+')':'')+'\n':''}${servSel?'Serviço: '+servSel.nome+'\n':''}${diaSel?'Dia que eu queria: '+fmtD(diaSel)+'\n':''}Tem como fazer um encaixe?`;
+ const t=`Oi, Mila! Tentei agendar pelo site, mas não encontrei um horário que sirva para mim.\n${nome?'👤 Nome: '+nome+(ap?' ('+ap+')':'')+'.\n':''}${servSel?'💅 Serviço: '+servSel.nome+'.\n':''}${diaSel?'📅 Dia que eu queria: '+fmtD(diaSel)+'.\n':''}Você consegue fazer um encaixe? Obrigada!`;
  return `https://wa.me/${wa.length<=11?'55'+wa:wa}?text=${encodeURIComponent(t)}`}
 function mostrarAjuda(on){const b=$('semHorario');b.hidden=!on;if(on)$('waAjuda').href=waMila()}
 $('waAjuda2').onclick=e=>{e.preventDefault();const u=waMila();if(u)window.open(u,'_blank');else alert('A Mila ainda não cadastrou o WhatsApp.')};
@@ -204,7 +204,9 @@ $('f').onsubmit=async e=>{
  if(sinal==='cartao'){$('doneTxt').innerHTML+=`<div class="mut" style="font-size:1rem">Sinal de ${R(sv)} no cartão — a Mila manda o link.</div>`}
  if(sinal==='pix'&&CFG.sinal.pix){$('pixBox').hidden=false;$('pixVal').textContent=R(sv);$('pixKey').textContent=CFG.sinal.pix;$('copyPix').onclick=()=>{navigator.clipboard?.writeText(CFG.sinal.pix).then(()=>$('copyPix').textContent='Copiado ✓').catch(()=>{})}}
  const wa=(CFG.contato.whatsapp||'').replace(/\D/g,'');
- const txt=`Oi Mila! Acabei de agendar pelo site:\n*${nome}*${row.apelido?' ('+row.apelido+')':''}\n${row.servico} · ${R(servSel.valor)}\n${fmtD(diaSel)} às ${horaSel}\nSinal: ${sinal==='pix'?'vou pagar agora por PIX ('+R(sv)+')':sinal==='cartao'?'quero pagar com cartão, me manda o link ('+R(sv)+')':'quero combinar'}\nPagamento no dia: ${row.pagamento==='cartao_parcelado'?'cartão em '+row.parcelas+'x':row.pagamento==='cartao'?'cartão à vista':row.pagamento||'-'}${row.pedidos?'\nPedidos: '+row.pedidos:''}`;
+ const pagTxt=row.pagamento==='cartao_parcelado'?'no cartão de crédito, em '+row.parcelas+'x':row.pagamento==='cartao'?'no cartão de crédito, à vista':row.pagamento==='dinheiro'?'em dinheiro':row.pagamento==='pix'?'por PIX':'a combinar';
+ const sinTxt=sinal==='pix'?'vou pagar agora por PIX ('+R(sv)+').':sinal==='cartao'?'quero pagar com cartão de crédito ('+R(sv)+'). Pode me mandar o link?':'prefiro combinar com você.';
+ const txt=`Oi, Mila! Acabei de agendar pelo site.\n\n👤 *${nome}*${row.apelido?' ('+row.apelido+')':''}\n💅 ${row.servico} — ${R(servSel.valor)}\n📅 ${fmtD(diaSel)}, às ${horaSel}.\n💰 Sinal: ${sinTxt}\n💳 Pagamento no dia: ${pagTxt}.${row.pedidos?'\n📝 Pedidos: '+row.pedidos.replace(/[.!?]?$/,'.'):''}\n\nFico no aguardo da confirmação. Obrigada!`;
  if(wa)$('waBtn').href=`https://wa.me/${wa.length<=11?'55'+wa:wa}?text=${encodeURIComponent(txt)}`;else $('waBtn').hidden=true;
  window.scrollTo({top:0,behavior:'smooth'});
 };
