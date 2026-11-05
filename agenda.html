@@ -726,15 +726,25 @@ function loginTela(){
  if(document.getElementById('nvLogin'))return;
  const d=document.createElement('div');d.id='nvLogin';d.style.cssText='position:fixed;inset:0;z-index:2000;background:var(--bg,#f6f1e7);display:grid;place-items:center;padding:20px';
  d.innerHTML=`<div class="card" style="max-width:380px;width:100%;text-align:center"><div style="font-family:'Great Vibes',cursive;font-size:2.4rem;color:var(--gold2,#8a6a1f);line-height:1">Mila Ferreira</div><div style="font-family:Cinzel,serif;font-size:.72rem;letter-spacing:.25em;color:var(--mut);margin-bottom:14px">GRIMÓRIO · AGENDA</div>
- <label style="text-align:left">E-mail</label><input id="lgEmail" type="email" value="${esc(NV.email)}" autocomplete="username"><label style="text-align:left">Senha</label><input id="lgPass" type="password" autocomplete="current-password">
+ <form onsubmit="NUVEM.login();return false" autocomplete="on"><label style="text-align:left">E-mail</label><input id="lgEmail" name="email" type="email" value="${esc(NV.email)}" autocomplete="username"><label style="text-align:left">Senha</label><input id="lgPass" name="password" type="password" autocomplete="current-password" value="${NV.pass?esc(atob(NV.pass)):''}">
+ <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.95rem;text-align:left"><input type="checkbox" id="lgLembrar" ${NV.pass?'checked':''}> Salvar e-mail e senha neste aparelho</label><button type="submit" hidden></button></form>
  <button class="btn p" style="width:100%;margin-top:12px" onclick="NUVEM.login()">Entrar</button><div id="lgMsg" class="mut" style="margin-top:8px;font-size:.9rem;min-height:1.2em"></div>
+ <a href="#" onclick="NUVEM.esqueci();return false" style="display:block;margin-top:6px;color:var(--gold2,#8a6a1f);font-size:.95rem">Esqueci a senha</a>
  <button class="btn s" style="margin-top:10px" onclick="NUVEM.offline()">Usar só neste aparelho (sem nuvem)</button></div>`;
  document.body.appendChild(d);setTimeout(()=>document.getElementById(NV.email?'lgPass':'lgEmail')?.focus(),50);
  document.getElementById('lgPass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 }
-async function login(){NV.email=document.getElementById('lgEmail').value.trim();saveNV();const m=document.getElementById('lgMsg');m.textContent='Entrando…';
+async function login(){NV.email=document.getElementById('lgEmail').value.trim();const lem=document.getElementById('lgLembrar')?.checked;const pw=document.getElementById('lgPass').value;NV.pass=lem?btoa(pw):'';saveNV();const m=document.getElementById('lgMsg');m.textContent='Entrando…';
  const r=await sb.auth.signInWithPassword({email:NV.email,password:document.getElementById('lgPass').value});if(r.error){m.textContent='E-mail ou senha incorretos.';return}
  document.getElementById('nvLogin').remove();await conectar()}
+async function esqueci(){const em=document.getElementById('lgEmail').value.trim();const m=document.getElementById('lgMsg');if(!em){m.textContent='Digite o e-mail acima e toque em "Esqueci a senha".';document.getElementById('lgEmail').focus();return}NV.email=em;saveNV();m.textContent='Enviando…';
+ const r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.href.split('#')[0].split('?')[0]});m.textContent=r.error?'Não consegui enviar: '+r.error.message:'Enviamos um link para '+em+'. Abra o e-mail e toque no link para criar uma nova senha (vale 1 hora).'}
+function novaSenhaTela(){if(document.getElementById('nvLogin'))document.getElementById('nvLogin').remove();if(document.getElementById('nvNova'))return;
+ const d=document.createElement('div');d.id='nvNova';d.style.cssText='position:fixed;inset:0;z-index:2000;background:var(--bg,#f6f1e7);display:grid;place-items:center;padding:20px';
+ d.innerHTML=`<div class="card" style="max-width:380px;width:100%;text-align:center"><div style="font-family:'Great Vibes',cursive;font-size:2.4rem;color:var(--gold2,#8a6a1f);line-height:1">Mila Ferreira</div><div style="font-family:Cinzel,serif;font-size:.72rem;letter-spacing:.25em;color:var(--mut);margin-bottom:14px">NOVA SENHA</div>
+ <label style="text-align:left">Nova senha (mínimo 6)</label><input id="np1" type="password" autocomplete="new-password"><label style="text-align:left">Repita a senha</label><input id="np2" type="password" autocomplete="new-password">
+ <button class="btn p" style="width:100%;margin-top:12px" onclick="NUVEM.salvarSenha()">Salvar nova senha</button><div id="npMsg" class="mut" style="margin-top:8px;font-size:.9rem;min-height:1.2em"></div></div>`;document.body.appendChild(d)}
+async function salvarSenha(){const a=document.getElementById('np1').value,b=document.getElementById('np2').value,m=document.getElementById('npMsg');if(a.length<6){m.textContent='A senha precisa ter pelo menos 6 caracteres.';return}if(a!==b){m.textContent='As senhas não conferem.';return}m.textContent='Salvando…';const r=await sb.auth.updateUser({password:a});if(r.error){m.textContent='Erro: '+r.error.message;return}m.textContent='Senha alterada ✓';setTimeout(()=>{history.replaceState(null,'',location.pathname);location.reload()},800)}
 function offline(){document.getElementById('nvLogin')?.remove();sessionStorage.setItem('nv-offline','1')}
 function dias(){S.cfg.dias=[...document.querySelectorAll('#nvDias input:checked')].map(i=>+i.value);persist()}
 function fecharData(){const v=document.getElementById('nvFechar').value;if(!v)return;S.cfg.fechados=[...new Set([...(S.cfg.fechados||[]),v])].sort();persist();listaFechados()}
@@ -746,8 +756,9 @@ function msg(t,id){const e=document.getElementById(id||'nvMsg');if(e)e.textConte
 async function conectar(){
  if(!NV.url||!NV.key||!window.supabase)return false;
  sb=sb||supabase.createClient(NV.url,NV.key);
+ if(!window.__nvAuthHook){window.__nvAuthHook=true;sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY')novaSenhaTela()});if(/type=recovery/.test(location.hash))novaSenhaTela()}
  const {data:{session}}=await sb.auth.getSession();
- if(!session){if(CFGW.SUPABASE_URL&&!sessionStorage.getItem('nv-offline'))loginTela();return false}
+ if(!session){if(NV.pass&&NV.email&&!window.__nvAuto){window.__nvAuto=true;const r=await sb.auth.signInWithPassword({email:NV.email,password:atob(NV.pass)});if(!r.error)return conectar()}if(CFGW.SUPABASE_URL&&!sessionStorage.getItem('nv-offline'))loginTela();return false}
  await puxar();
  document.getElementById('nvForm').hidden=true;document.getElementById('nvOn').hidden=false;document.getElementById('nvQuem').textContent=session.user.email;
  await carregarNovos();escutar();publicar(false);window.NUVEM_LOGADA=true;return true;
@@ -764,7 +775,7 @@ async function entrar(){
  if(r.error){msg('Não entrou: '+r.error.message);return}
  msg('');await conectar();
 }
-async function sair(){if(sb)await sb.auth.signOut();location.reload()}
+async function sair(){if(sb)await sb.auth.signOut();NV.pass='';saveNV();location.reload()}
 
 // ---- Pedidos novos (tempo real) ----
 async function carregarNovos(){const r=await sb.from('bookings').select('*').eq('status','novo').order('created_at');if(!r.error){NOVOS=r.data;banner()}}
@@ -813,7 +824,9 @@ async function restaurar(){if(!confirm('Substituir a agenda deste aparelho pelo 
 const _salvar=window.salvar;
 if(_salvar)window.salvar=function(){const antes=S.apts.length;const ids=new Set(S.apts.map(a=>a.id));_salvar.apply(this,arguments);if(window.NUVEM_IMPORT){const nov=S.apts.find(a=>!ids.has(a.id));if(nov)marcarImportado(nov.id);const av=document.getElementById('nvAviso');if(av)av.remove()}};
 
-window.NUVEM={entrar,sair,importar,recusar,publicar,backup,restaurar,baixar,restaurarArq,login,offline,dias,fechar:fecharData,abrir:abrirData};
+window.NUVEM={entrar,sair,importar,recusar,publicar,backup,restaurar,baixar,restaurarArq,login,offline,dias,fechar:fecharData,abrir:abrirData,esqueci,salvarSenha};
+// ---- Atualização automática do app (quando aberto pelo link / ícone) ----
+if(location.protocol.startsWith('http')){let etag=null;const checa=async()=>{try{const r=await fetch(location.pathname+'?v='+Date.now(),{method:'HEAD',cache:'no-store'});const t=r.headers.get('etag')||r.headers.get('last-modified');if(!t)return;if(etag&&t!==etag){let b=document.getElementById('nvUpd');if(!b){b=document.createElement('div');b.id='nvUpd';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:3000;background:var(--black,#141210);color:#f3e6c4;border:1px solid var(--gold,#b8923a);border-radius:999px;padding:8px 14px;font-size:.9rem;box-shadow:0 8px 24px #0006;cursor:pointer';b.textContent='✨ Nova versão disponível — toque para atualizar';b.onclick=()=>location.reload(true);document.body.appendChild(b)}}etag=t}catch(e){}};checa();setInterval(checa,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checa()})}
 window.NUVEM_NOVOS=()=>NOVOS;window.NUVEM_ON=()=>!!(sb&&window.NUVEM_LOGADA);
 window.NUVEM_BRUXA=async cfg=>{if(sb)await sb.from('settings').upsert({key:'bruxa',value:cfg})};
 window.NUVEM_INVOCAR=async()=>{try{const r=await fetch(NV.url+'/functions/v1/bruxa?agora=1',{headers:{Authorization:'Bearer '+NV.key}});return r.ok}catch(e){return false}};
