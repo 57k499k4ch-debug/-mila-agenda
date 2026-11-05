@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Code · Agendar com a Mila</title>
+<meta name="author" content="Mariana Pereira"><meta name="copyright" content="© 2026 Mariana Pereira. Todos os direitos reservados.">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Great+Vibes&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f6f1e7;color:#1a1612;font-family:"Cormorant Garamond",Georgia,serif;font-size:18px;padding:20px 16px 40px}main{max-width:520px;margin:auto;text-align:center}
+h1{font-family:Cinzel,serif;font-size:.9rem;letter-spacing:.25em;color:#8a6a1f}input{width:100%;box-sizing:border-box;font:inherit;padding:10px 12px;border:1px solid #e3d9c6;border-radius:12px;margin:8px 0}
+.btn{padding:12px 18px;border-radius:12px;border:0;background:#141210;color:#f3e6c4;font-family:Cinzel,serif;letter-spacing:.12em;font-size:.85rem;cursor:pointer;margin:6px 4px}
+canvas{max-width:100%;border-radius:18px;box-shadow:0 10px 30px #0002;margin-top:14px}.mut{color:#6f655a;font-size:.9rem}</style></head>
+<body><main><h1>QR Code · Agendar com a Mila</h1>
+<p class="mut">Cole o link da página de agendamento e gere a imagem para o status, Instagram ou impressão.</p>
+<input id="url" placeholder="https://…" value=""><input id="sub" value="Agende seu horário · aponte a câmera">
+<button class="btn" onclick="gerar()">Gerar</button><button class="btn" onclick="baixar()">Baixar imagem</button>
+<canvas id="c" width="1080" height="1350"></canvas>
+<p class="mut" style="font-size:.58rem;opacity:.3">© 2026 Mariana Pereira</p></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+async function gerar(){const u=document.getElementById('url').value.trim();if(!u){alert('Cole o link primeiro.');return}await document.fonts.ready;
+ const tmp=document.createElement('div');new QRCode(tmp,{text:u,width:640,height:640,correctLevel:QRCode.CorrectLevel.M,colorDark:'#141210',colorLight:'#fffdf8'});
+ await new Promise(r=>setTimeout(r,150));const img=tmp.querySelector('img')||tmp.querySelector('canvas');
+ const c=document.getElementById('c'),x=c.getContext('2d');x.fillStyle='#f6f1e7';x.fillRect(0,0,1080,1350);
+ x.strokeStyle='#b8923a';x.lineWidth=4;x.strokeRect(50,50,980,1250);x.strokeRect(62,62,956,1226);
+ x.textAlign='center';x.fillStyle='#8a6a1f';x.font='120px "Great Vibes"';x.fillText('Mila Ferreira',540,230);
+ x.fillStyle='#6f655a';x.font='32px Cinzel';x.fillText('N A I L   D E S I G N E R  ·  A G E N D A   O N L I N E',540,290);
+ x.fillStyle='#fffdf8';x.fillRect(200,370,680,680);x.strokeStyle='#b8923a';x.lineWidth=3;x.strokeRect(200,370,680,680);
+ x.drawImage(img,220,390,640,640);
+ x.fillStyle='#141210';x.font='600 54px "Cormorant Garamond"';x.fillText(document.getElementById('sub').value,540,1140);
+ x.fillStyle='#6f655a';x.font='30px "Cormorant Garamond"';x.fillText(u.replace(/^https?:\/\//,''),540,1200);
+ x.font='24px Cinzel';x.fillText('✦  HORÁRIOS AO VIVO  ·  SINAL POR PIX  ✦',540,1265);}
+function baixar(){const a=document.createElement('a');a.download='qr-agendar-mila.png';a.href=document.getElementById('c').toDataURL('image/png');a.click()}
+</script></body></html>

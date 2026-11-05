@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agenda Online · Mila Ferreira</title>
+<meta name="author" content="Mariana Pereira">
+<meta name="copyright" content="© 2026 Mariana Pereira. Todos os direitos reservados.">
+<meta name="application-name" content="Agenda Online · Mila Ferreira">
+<meta name="description" content="Agenda Online · Mila Ferreira — agendamento com horários em tempo real. Software de Mariana Pereira.">
+<meta name="theme-color" content="#151311">
+<!-- © 2026 Mariana Pereira. Todos os direitos reservados. Lei 9.609/98 e Lei 9.610/98. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f3f0;--card:#ffffff;--ink:#151311;--mut:#6b665e;--line:#e4e1da;--gold:#b8923a;--gold2:#8a6a1f;--black:#151311;--ok:#1f7a3a;--warn:#b45309;--err:#b3261e}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+.top{background:var(--black);color:#fff;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px))) 0 calc(-1*max(16px,env(safe-area-inset-right,0px)));padding:18px max(16px,env(safe-area-inset-left,0px)) 56px}
+.top .in{max-width:640px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}.mono{width:42px;height:42px;border-radius:10px;border:1.5px solid var(--gold);display:grid;place-items:center;font-family:Cinzel,serif;font-weight:700;color:var(--gold);font-size:1.1rem}
+.logo b{display:block;font-family:Cinzel,serif;font-weight:600;letter-spacing:.08em;font-size:1rem}.logo span{display:block;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:#bdb7ab}
+.pill{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#bdb7ab;border:1px solid #3a352f;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.pill i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 0 3px #3ddc8433}
+main{width:100%;max-width:640px;margin:-38px auto 0;position:relative}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:12px;box-shadow:0 2px 10px #0000000a}
+h2{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:0 0 12px;display:flex;align-items:center;gap:10px;font-weight:600}
+h2 .n{width:22px;height:22px;border-radius:50%;background:var(--black);color:var(--gold);display:grid;place-items:center;font-size:.7rem;font-weight:700}
+label{display:block;font-size:.8rem;font-weight:500;color:var(--mut);margin:10px 0 4px}
+input,select,textarea{width:100%;font:inherit;font-size:.95rem;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:-1px;border-color:var(--gold)}
+textarea{min-height:70px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.serv{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:8px;cursor:pointer;background:#fff}
+.serv.on{border-color:var(--gold);background:#fbf7ee;box-shadow:0 0 0 1px var(--gold) inset}
+.serv input{width:auto;accent-color:var(--gold2)}.serv .n{flex:1;font-weight:500}.serv .v{font-weight:600}.serv .d{font-size:.78rem;color:var(--mut);font-weight:400}
+.cat{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-top:14px;font-weight:600}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.day{flex:0 0 64px;scroll-snap-align:start;text-align:center;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+.day.on{background:var(--black);color:#fff;border-color:var(--black)}.day.on small{color:var(--gold)}
+.day.off{opacity:.35;cursor:default}
+.day b{display:block;font-size:1.2rem;line-height:1.1}.day small{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;margin-top:10px}
+.slot{padding:9px 0;text-align:center;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:500;font-variant-numeric:tabular-nums}
+.slot.on{background:var(--gold2);color:#fff;border-color:var(--gold2)}
+.slot.pend{border-style:dashed;border-color:#d9a441;background:#fff8e6;color:#8a6a1f}.slot.pend small{display:block;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;line-height:1.1;margin-top:2px}.slot.pend.on{background:#d9a441;color:#fff;border-color:#d9a441}.slot.pend.on small{color:#fff}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:8px;cursor:pointer;background:#fff;font-size:.92rem}
+.opt.on{border-color:var(--gold);background:#fbf7ee}.opt input{width:auto;margin-top:4px;accent-color:var(--gold2)}.opt b{font-weight:600}
+.btn{width:100%;margin-top:16px;padding:14px;border-radius:12px;border:0;background:var(--black);color:#fff;font-weight:600;font-size:.95rem;cursor:pointer;letter-spacing:.02em}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.g{background:#1ebe5d;color:#fff}
+.msg{padding:10px 12px;border-radius:10px;font-size:.88rem;margin-top:10px}
+.msg.ok{background:#e8f5ec;color:var(--ok)}.msg.warn{background:#fdf2e3;color:var(--warn)}.msg.err{background:#fbe9e7;color:var(--err)}
+.mut{color:var(--mut);font-size:.85rem}
+.big{font-size:1.15rem;text-align:center;margin:8px 0;font-weight:500}
+.pix{font-family:ui-monospace,Menlo,monospace;font-size:.9rem;background:#faf8f2;border:1px dashed var(--gold);padding:10px;border-radius:10px;word-break:break-all;text-align:center}
+footer{text-align:center;color:var(--mut);font-size:.75rem;margin-top:26px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><div class="logo"><div class="mono">MF</div><div><b>MILA FERREIRA</b><span>Nail Designer · Agenda Online</span></div></div><div class="pill"><i></i>horários em tempo real</div></div></div>
+<main>
+
+
+<div id="setup" class="card" hidden><h2>Configuração pendente</h2><p>Esta página ainda não foi ligada ao banco. Preencha <b>config.js</b> com a URL e a chave do Supabase.</p></div>
+
+<form id="f" novalidate>
+<div class="card"><h2><span class="n">1</span>Você</h2>
+ <label>Nome completo *</label><input id="nome" required autocomplete="name" placeholder="Nome e sobrenome">
+ <label>Mila me conhece como <span class="mut">(apelido, se tiver)</span></label><input id="apelido" placeholder="Ex.: Dani, Lu…">
+ <div class="row"><div><label>WhatsApp *</label><input id="tel" type="tel" inputmode="tel" required placeholder="(21) 99999-9999"></div>
+ <div><label>Já foi atendida pela Mila?</label><select id="primeira"><option value="0">Sim, já sou cliente</option><option value="1">Não, primeira vez</option></select></div></div>
+ <label>Quem indicou / referência</label><input id="ref" placeholder="Ex.: indicação da Carla, Instagram…">
+</div>
+
+<div class="card"><h2><span class="n">2</span>Serviço</h2><div id="servs"><p class="mut">Carregando tabela de valores…</p></div></div>
+
+<div class="card"><h2><span class="n">3</span>Dia e horário</h2>
+ <div id="days" class="days"></div>
+ <div id="slotsBox"><p class="mut" id="slotsHint">Escolha o serviço e o dia para ver os horários livres.</p><div id="slots" class="slots"></div></div>
+ <div id="semHorario" class="msg warn" hidden>Não encontrou um dia ou horário que sirva? Fale direto com a Mila — ela tenta um encaixe para você.<br><a id="waAjuda" class="btn g" style="display:block;text-align:center;text-decoration:none;margin-top:10px" target="_blank" rel="noopener">💬 Pedir encaixe à Mila no WhatsApp</a></div>
+ <p class="mut" style="margin-top:10px;text-align:center"><a href="#" id="waAjuda2" style="color:var(--gold2)">Prefere outro dia ou horário? Fale com a Mila →</a></p>
+</div>
+
+<div class="card"><h2><span class="n">4</span>Sinal de agendamento</h2>
+ <p class="mut" id="sinalTxt">Para garantir o horário, a Mila pede um sinal de agendamento. O valor é abatido do serviço.</p>
+ <label class="opt on"><input type="radio" name="sinal" value="pix" checked><div><b>Vou pagar agora por PIX</b><div class="mut">Depois de enviar, você vê a chave e manda o comprovante no WhatsApp.</div></div></label>
+ <label class="opt" id="optSinalCard"><input type="radio" name="sinal" value="cartao"><div><b>Quero pagar o sinal com cartão de crédito</b><div class="mut">A Mila manda o link de pagamento no WhatsApp.</div></div></label>
+ <label class="opt"><input type="radio" name="sinal" value="combinar"><div><b>Prefiro combinar com a Mila</b><div class="mut">O horário fica reservado até a confirmação dela.</div></div></label>
+</div>
+
+<div class="card"><h2><span class="n">5</span>Pagamento do serviço</h2>
+ <p class="mut">Como você pretende pagar no dia? (o sinal é abatido)</p>
+ <div id="pagOpts"></div>
+ <div id="parcBox" hidden><label>Em quantas vezes?</label><select id="parcelas"></select><div class="mut" id="parcInfo"></div></div>
+ <label>Pedidos / observações</label><textarea id="ped" placeholder="Cor, decoração, alergias, referência de foto…"></textarea>
+</div>
+
+<div id="erro" class="msg err" hidden></div>
+<button class="btn" id="btn" type="submit">Confirmar agendamento</button>
+</form>
+
+<div id="done" class="card" hidden>
+ <h2><span class="n">✓</span>Agendamento recebido</h2>
+ <div class="big" id="doneTxt"></div>
+ <div id="pixBox" hidden><p class="mut" style="text-align:center">Sinal de <b id="pixVal"></b> · chave PIX:</p><div class="pix" id="pixKey"></div><button class="btn" type="button" id="copyPix" style="background:var(--gold)">Copiar chave</button></div>
+ <p class="mut" style="text-align:center;margin-top:14px">A Mila recebeu o aviso e vai confirmar pelo WhatsApp. Se quiser, mande uma mensagem agora:</p>
+ <a id="waBtn" class="btn g" style="display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener">Falar com a Mila no WhatsApp</a>
+ <button class="btn" type="button" style="background:transparent;color:var(--ink);border:1px solid var(--line)" onclick="location.reload()">Fazer outro agendamento</button>
+</div>
+
+<footer>Seus dados são usados somente para este atendimento. Horários sincronizados com a agenda da profissional.</footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+const C=window.CONFIG||{};const $=id=>document.getElementById(id);
+const R=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',');
+const toMin=h=>{const [a,b]=String(h).split(':');return (+a)*60+(+b)};const fromMin=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const fmtD=s=>s.split('-').reverse().join('/');
+let sb=null,SERV=[],PEND=[],CFG={horario:{ini:'08:00',fim:'19:00',gap:10,dias:[1,2,3,4,5,6]},sinal:{tipo:'pct',valor:30,pix:C.PIX_KEY||''},contato:{whatsapp:C.MILA_WA||''},pagamento:{pix:true,dinheiro:true,cartao:true,parcelas:3,acrescimo:0}},BUSY=[];
+let servSel=null,diaSel=null,horaSel=null;
+
+async function init(){
+ if(!C.SUPABASE_URL||!C.SUPABASE_ANON_KEY){$('setup').hidden=false;$('f').hidden=true;return}
+ sb=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
+ const [s,st,b,pe]=await Promise.all([
+  sb.from('services').select('*').eq('ativo',true).order('ordem').order('id'),
+  sb.from('settings').select('*'),
+  sb.from('busy').select('*').gte('data',iso(new Date())),
+  sb.from('pendentes').select('*')]);
+ if(s.error){erro('Não consegui carregar a tabela de valores. Tente de novo.');return}
+ SERV=s.data||[];PEND=pe.data||[];(st.data||[]).forEach(r=>CFG[r.key]=Object.assign({},CFG[r.key],r.value));BUSY=b.data||[];
+ if(C.MILA_WA)CFG.contato.whatsapp=C.MILA_WA;if(C.PIX_KEY)CFG.sinal.pix=C.PIX_KEY;
+ renderServ();renderDays();sinalInfo();renderPag();
+ // tempo real: se a Mila marcar alguém enquanto a cliente escolhe, os horários somem
+ sb.channel('busy').on('postgres_changes',{event:'*',schema:'public',table:'busy'},async()=>{const r=await sb.from('busy').select('*').gte('data',iso(new Date()));if(!r.error){BUSY=r.data;renderSlots()}}).subscribe();
+ setInterval(async()=>{const r=await sb.from('pendentes').select('*');if(!r.error){PEND=r.data;renderSlots()}},20000);
+}
+function sinalInfo(){const t=CFG.sinal;$('sinalTxt').textContent=`Para garantir o horário, a Mila pede um sinal de agendamento de ${t.tipo==='fixo'?R(t.valor):t.valor+'% do valor'}. O valor é abatido do serviço.`}
+function renderPag(){
+ const p=CFG.pagamento,o=[];if(p.pix!==false)o.push(['pix','PIX no dia','']);if(p.dinheiro!==false)o.push(['dinheiro','Dinheiro','']);
+ if(p.cartao!==false){o.push(['cartao','Cartão de crédito à vista',p.acrescimo?'acréscimo de '+p.acrescimo+'%':'']);if(+p.parcelas>1)o.push(['cartao_parcelado','Cartão de crédito parcelado','até '+p.parcelas+'x'+(p.acrescimo?' · acréscimo de '+p.acrescimo+'%':'')])}
+ else $('optSinalCard').hidden=true;
+ $('pagOpts').innerHTML=o.map(([v,t,s],i)=>`<label class="opt${i?'':' on'}"><input type="radio" name="pag" value="${v}"${i?'':' checked'}><div><b>${t}</b>${s?'<div class="mut">'+s+'</div>':''}</div></label>`).join('');
+ document.querySelectorAll('#pagOpts input').forEach(i=>i.onchange=()=>{document.querySelectorAll('#pagOpts .opt').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));parcelas()});parcelas();
+}
+function parcelas(){const v=document.querySelector('input[name=pag]:checked')?.value;const box=$('parcBox');box.hidden=v!=='cartao_parcelado';if(box.hidden)return;const p=CFG.pagamento,sel=$('parcelas');const n=Math.max(2,+p.parcelas||2);sel.innerHTML='';for(let i=2;i<=n;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'x';sel.appendChild(o)}parcInfo();sel.onchange=parcInfo}
+function parcInfo(){const n=+$('parcelas').value||2;if(!servSel){$('parcInfo').textContent='';return}const tot=servSel.valor*(1+(+CFG.pagamento.acrescimo||0)/100);$('parcInfo').textContent=`${n}x de ${R(tot/n)} (total ${R(tot)})`}
+function sinalValor(){if(!servSel)return 0;const t=CFG.sinal;return t.tipo==='fixo'?+t.valor:Math.round(servSel.valor*(+t.valor)/100*100)/100}
+function renderServ(){
+ const cats=[...new Set(SERV.map(x=>x.categoria||''))];
+ $('servs').innerHTML=SERV.length?cats.map(c=>(c?`<div class="cat">${c}</div>`:'')+SERV.filter(x=>(x.categoria||'')===c).map(x=>`<label class="serv" data-id="${x.id}"><input type="radio" name="serv" value="${x.id}"><span class="n">${x.nome}<div class="d">${x.duracao} min</div></span><span class="v">${R(x.valor)}</span></label>`).join('')).join(''):'<p class="mut">A tabela ainda não foi publicada.</p>';
+ document.querySelectorAll('.serv input').forEach(i=>i.onchange=()=>{document.querySelectorAll('.serv').forEach(l=>l.classList.toggle('on',l.dataset.id==i.value));servSel=SERV.find(x=>x.id==i.value);horaSel=null;renderSlots();parcInfo()})
+}
+function renderDays(){
+ const h=CFG.horario,out=[];const d=new Date();d.setHours(12,0,0,0);
+ for(let i=0;i<21;i++){const k=iso(d),off=!h.dias.includes(d.getDay())||(h.fechados||[]).includes(k);out.push(`<div class="day${off?' off':''}" data-d="${k}" data-off="${off?1:0}"><small>${d.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','')}</small><b>${d.getDate()}</b><small>${d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}</small></div>`);d.setDate(d.getDate()+1)}
+ $('days').innerHTML=out.join('');
+ document.querySelectorAll('.day').forEach(el=>el.onclick=()=>{if(el.dataset.off==='1')return;document.querySelectorAll('.day').forEach(x=>x.classList.remove('on'));el.classList.add('on');diaSel=el.dataset.d;horaSel=null;renderSlots()});
+}
+function livres(data,dur){
+ const h=CFG.horario,ini=toMin(h.ini),fm=toMin(h.fim),gap=+h.gap||0,out=[];const agora=new Date();const hojeK=iso(agora);const minAgora=agora.getHours()*60+agora.getMinutes()+60;
+ const occ=BUSY.filter(b=>b.data===data).map(b=>[toMin(b.hora_ini),toMin(b.hora_fim)]);
+ for(let m=ini;m+dur<=fm;m+=15){if(data===hojeK&&m<minAgora)continue;if(!occ.some(([a,b])=>m<b+gap&&m+dur+gap>a))out.push(fromMin(m))}
+ return out;
+}
+function pendente(data,hora,dur){const a=toMin(hora),b=a+dur,gap=+CFG.horario.gap||0;return PEND.some(x=>x.data===data&&a<toMin(x.hora)+(+x.duracao||60)+gap&&b+gap>toMin(x.hora))}
+function renderSlots(){
+ const box=$('slots'),hint=$('slotsHint');box.innerHTML='';
+ if(!servSel||!diaSel){hint.hidden=false;hint.textContent=!servSel?'Escolha o serviço para ver os horários livres.':'Escolha o dia para ver os horários livres.';return}
+ const l=livres(diaSel,servSel.duracao);
+ if(!l.length){hint.hidden=false;hint.textContent='Nenhum horário livre neste dia para esse serviço.';mostrarAjuda(true);return}
+ mostrarAjuda(false);
+ hint.hidden=false;hint.textContent=`Horários livres em ${fmtD(diaSel)} · ${servSel.duracao} min`;
+ box.innerHTML=l.map(h=>{const pd=pendente(diaSel,h,servSel.duracao);return `<div class="slot${h===horaSel?' on':''}${pd?' pend':''}" data-h="${h}" data-p="${pd?1:0}">${h}${pd?'<small>aguardando</small>':''}</div>`}).join('');
+ if(l.some(h=>pendente(diaSel,h,servSel.duracao)))box.insertAdjacentHTML('afterend','<p class="mut" id="pendHint" style="margin-top:8px">⏳ <b>aguardando</b> = outra cliente já pediu esse horário e a Mila ainda não confirmou. Você pode pedir também; a Mila decide e avisa.</p>');else document.getElementById('pendHint')?.remove();
+ box.querySelectorAll('.slot').forEach(s=>s.onclick=()=>{horaSel=s.dataset.h;box.querySelectorAll('.slot').forEach(x=>x.classList.toggle('on',x.dataset.h===horaSel))});
+}
+document.querySelectorAll('.opt input').forEach(i=>i.onchange=()=>document.querySelectorAll('.opt').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked)));
+function waMila(){const wa=(CFG.contato.whatsapp||'').replace(/\D/g,'');if(!wa)return '';const nome=$('nome').value.trim(),ap=$('apelido').value.trim();
+ const t=`Oi Mila! Tentei agendar pelo site e não achei um horário que sirva.\n${nome?'Nome: '+nome+(ap?' ('+ap+')':'')+'\n':''}${servSel?'Serviço: '+servSel.nome+'\n':''}${diaSel?'Dia que eu queria: '+fmtD(diaSel)+'\n':''}Tem como fazer um encaixe?`;
+ return `https://wa.me/${wa.length<=11?'55'+wa:wa}?text=${encodeURIComponent(t)}`}
+function mostrarAjuda(on){const b=$('semHorario');b.hidden=!on;if(on)$('waAjuda').href=waMila()}
+$('waAjuda2').onclick=e=>{e.preventDefault();const u=waMila();if(u)window.open(u,'_blank');else alert('A Mila ainda não cadastrou o WhatsApp.')};
+function erro(t){const e=$('erro');e.hidden=!t;e.textContent=t||''}
+$('f').onsubmit=async e=>{
+ e.preventDefault();erro('');
+ const nome=$('nome').value.trim(),tel=$('tel').value.replace(/\D/g,'');
+ if(nome.split(/\s+/).length<2)return erro('Escreva o nome completo (nome e sobrenome).');
+ if(tel.length<10||tel.length>13)return erro('Confira o WhatsApp (com DDD).');
+ if(!servSel)return erro('Escolha um serviço.');if(!diaSel||!horaSel)return erro('Escolha o dia e o horário.');
+ const btn=$('btn');btn.disabled=true;btn.textContent='Enviando…';
+ // confere de novo se o horário continua livre
+ const chk=await sb.from('busy').select('*').eq('data',diaSel);if(!chk.error){BUSY=BUSY.filter(b=>b.data!==diaSel).concat(chk.data);if(!livres(diaSel,servSel.duracao).includes(horaSel)){horaSel=null;renderSlots();btn.disabled=false;btn.textContent='Confirmar agendamento';return erro('Esse horário acabou de ser ocupado. Escolha outro.')}}
+ const sinal=document.querySelector('input[name=sinal]:checked').value,sv=sinalValor();
+ const row={nome,apelido:$('apelido').value.trim()||null,telefone:tel,referencia:$('ref').value.trim()||null,primeira:$('primeira').value==='1',service_id:servSel.id,servico:(servSel.categoria?servSel.categoria+' — ':'')+servSel.nome,valor:servSel.valor,duracao:servSel.duracao,data:diaSel,hora:horaSel,sinal_tipo:sinal,sinal_valor:sv,pedidos:(($('ped').value.trim())+(pendente(diaSel,horaSel,servSel.duracao)?'\n(horário também pedido por outra cliente — aguardando a Mila)':''))||null,status:'novo',pagamento:document.querySelector('input[name=pag]:checked')?.value||null,parcelas:document.querySelector('input[name=pag]:checked')?.value==='cartao_parcelado'?+$('parcelas').value:1};
+ const r=await sb.from('bookings').insert(row);
+ if(r.error){btn.disabled=false;btn.textContent='Confirmar agendamento';return erro('Não consegui enviar. Tente de novo ou fale direto com a Mila no WhatsApp.')}
+ $('f').hidden=true;$('done').hidden=false;
+ $('doneTxt').innerHTML=`<b>${servSel.nome}</b><br>${fmtD(diaSel)} às ${horaSel}`+(pendente(diaSel,horaSel,servSel.duracao)?`<div class="msg warn">⏳ Outra cliente também pediu este horário. A Mila vai decidir e te avisar pelo WhatsApp.</div>`:'');
+ if(sinal==='cartao'){$('doneTxt').innerHTML+=`<div class="mut" style="font-size:1rem">Sinal de ${R(sv)} no cartão — a Mila manda o link.</div>`}
+ if(sinal==='pix'&&CFG.sinal.pix){$('pixBox').hidden=false;$('pixVal').textContent=R(sv);$('pixKey').textContent=CFG.sinal.pix;$('copyPix').onclick=()=>{navigator.clipboard?.writeText(CFG.sinal.pix).then(()=>$('copyPix').textContent='Copiado ✓').catch(()=>{})}}
+ const wa=(CFG.contato.whatsapp||'').replace(/\D/g,'');
+ const txt=`Oi Mila! Acabei de agendar pelo site:\n*${nome}*${row.apelido?' ('+row.apelido+')':''}\n${row.servico} · ${R(servSel.valor)}\n${fmtD(diaSel)} às ${horaSel}\nSinal: ${sinal==='pix'?'vou pagar agora por PIX ('+R(sv)+')':sinal==='cartao'?'quero pagar com cartão, me manda o link ('+R(sv)+')':'quero combinar'}\nPagamento no dia: ${row.pagamento==='cartao_parcelado'?'cartão em '+row.parcelas+'x':row.pagamento==='cartao'?'cartão à vista':row.pagamento||'-'}${row.pedidos?'\nPedidos: '+row.pedidos:''}`;
+ if(wa)$('waBtn').href=`https://wa.me/${wa.length<=11?'55'+wa:wa}?text=${encodeURIComponent(txt)}`;else $('waBtn').hidden=true;
+ window.scrollTo({top:0,behavior:'smooth'});
+};
+init().catch(()=>erro('Falha ao carregar. Verifique a conexão e recarregue.'));
+</script>
+<div id="autoria" style="text-align:center;font-size:.58rem;opacity:.28;padding:14px 10px 20px;letter-spacing:.04em">© 2026 Mariana Pereira</div>
+</body>
+</html>
