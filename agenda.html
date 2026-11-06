@@ -13,7 +13,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:wght@500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4eee3;--bg2:#0f0e0c;--card:var(--field);--card2:#faf4e8;--panel:var(--panel);--field:var(--field);--line:#e3d6bf;--line2:var(--line2);--gold:#b8923a;--gold2:#8a6a1f;--gold3:#d4b25c;--ink:#1c1a17;--mut:#7d7262;--ok:#2e8b57;--bad:#b4303f;--warn:#b67c12;--purple:#6b4fa3;--black:#0f0e0c;--glow1:#fff8ea;--glow2:#efe4cf;--onblack:#f1e9d8;--serif:'Cormorant Garamond',Georgia,serif;--caps:Cinzel,serif;--script:'Great Vibes',cursive}
+:root{--bg:#f4eee3;--bg2:#0f0e0c;--card:#fffdf8;--card2:#faf4e8;--panel:#fbf6ea;--field:#fffdf8;--line:#e3d6bf;--line2:#ece2cf;--gold:#b8923a;--gold2:#8a6a1f;--gold3:#d4b25c;--ink:#1c1a17;--mut:#7d7262;--ok:#2e8b57;--bad:#b4303f;--warn:#b67c12;--purple:#6b4fa3;--black:#0f0e0c;--glow1:#fff8ea;--glow2:#efe4cf;--onblack:#f1e9d8;--serif:'Cormorant Garamond',Georgia,serif;--caps:Cinzel,serif;--script:'Great Vibes',cursive}
 :root[data-theme="dark"]{--bg:#0b0a0f;--bg2:#070609;--card:#15121d;--card2:#1b1726;--panel:#100d17;--field:#0c0a12;--line:#2b2538;--line2:#1f1a2b;--gold:#d4af37;--gold2:#f3d77a;--gold3:#e6c866;--ink:#efe8d8;--mut:#9a9089;--ok:#4fd18b;--bad:#e05a6a;--warn:#e8b04b;--purple:#a78bfa;--black:#07060a;--glow1:#1c1430;--glow2:#1a1226;--onblack:#f1e9d8}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,sans-serif}
 body{background:radial-gradient(900px 500px at 100% -10%,var(--glow1) 0%,transparent 60%),radial-gradient(700px 400px at -10% 110%,var(--glow2) 0%,transparent 60%),var(--bg);min-height:100vh;font-size:15px}
@@ -96,6 +96,18 @@ table{display:block;overflow-x:auto;max-width:100%}
 .fab{position:fixed;right:18px;bottom:calc(74px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;background:var(--black);color:var(--gold3);font-size:1.7rem;border:none;box-shadow:0 8px 24px rgba(212,175,55,.35);cursor:pointer;z-index:8}
 @media(min-width:861px){.fab{bottom:24px}}
 .cv{position:relative;width:100%}.cv canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{padding:7px 11px;border:1px solid var(--gold);border-radius:999px;background:var(--card);color:var(--gold2);font-weight:600;font-size:.9rem;cursor:pointer;font-variant-numeric:tabular-nums}.chip.on{background:var(--gold2);color:#fff;border-color:var(--gold2)}
+@media(max-width:860px){
+#modal .sheet{max-height:92vh;padding-bottom:0}
+#modal .sheet>.row>div{min-width:0;flex:1 1 calc(50% - 10px)}
+#modal .sheet>.row>div:has(#fNome),#modal .sheet>.row>div:has(#fData),#modal .sheet>.row>div:has(#fServ){flex-basis:100%}
+#modal .sheet>.row>div:has(#fTel),#modal .sheet>.row>div:has(#fVal){flex-basis:100%}
+#modal .sheet>.row:last-child{position:sticky;bottom:0;background:var(--card);padding:10px 0 calc(12px + env(safe-area-inset-bottom));margin-top:12px;border-top:1px solid var(--line);z-index:2}
+#modal .sheet>.row:last-child .btn{flex:1}
+#modal input[type=date],#modal input[type=time]{min-width:0;width:100%}
+#modal .h{font-size:.64rem}
+}
 </style>
 </head>
 <body>
@@ -404,10 +416,10 @@ function autoTel(){const n=document.getElementById('fNome').value.trim();const c
  const v=S.apts.filter(a=>a.nome===n&&a.st==='feito').sort(byTime);const ult=v[v.length-1];const faltas=S.apts.filter(a=>a.nome===n&&a.st==='falt').length;const P=n?pendencias(n):null;let pend='';if(P&&(P.cred||P.devTot||P.ret.length||P.faltas.length||(P.ultFb&&P.ultFb.obs))){const usando=window.USACRED===n;pend=`<div class="alert warn" style="margin-top:6px"><b>📌 Pendências desta cliente</b><ul style="margin:6px 0 0;padding-left:18px">${P.cred?`<li>💰 <b>Crédito de ${R(P.cred)}</b> (sinal guardado de ${P.creditos.map(x=>fmtD(x.data)).join(', ')}). ${usando?'<span class="ok">✓ aplicado como sinal deste horário</span>':`<button class="btn s" type="button" onclick="usarCredito()">Usar como sinal</button>`}</li>`:''}${P.devTot?`<li>🧾 <b>Está devendo ${R(P.devTot)}</b> (${P.dev.map(x=>fmtD(x.a.data)+' '+x.a.serv).join('; ')}).</li>`:''}${P.ret.length?`<li>🔒 Sinal retido em ${P.ret.map(a=>fmtD(a.data)).join(', ')} (${P.ret[0].st==='falt'?'falta':'cancelamento'}).</li>`:''}${P.faltas.length?`<li>🚫 ${P.faltas.length} falta(s)${P.faltas.length>=2?' — considere pedir o sinal antes de reservar':''}.</li>`:''}${P.ultFb&&P.ultFb.obs?`<li>💬 Último atendimento (${fmtD(P.ult.data)}): ${P.ultFb.obs}</li>`:''}${P.ultFb&&P.ultFb.tags&&P.ultFb.tags.length?`<li>🏷️ ${P.ultFb.tags.join(', ')}</li>`:''}</ul></div>`}
  document.getElementById('fCliInfo').innerHTML=avisosCli(n,document.getElementById('fTel').value)+pend+((c||v.length)?`${c&&c.apelido?'“'+c.apelido+'” · ':''}${c&&c.ref?'↗ '+c.ref+' · ':''}🔮 ${v.length} visita(s)${ult?' · última '+fmtD(ult.data)+' ('+ult.serv+')':''}${faltas?` · <span class="bad">${faltas} falta(s)</span>`:''}${c&&c.obs?' · '+c.obs:''}${ult&&ult.fb&&ult.fb.obs?'<br>💬 última vez: '+ult.fb.obs:''}`:'')}
 function checar(){const d=document.getElementById('fData').value,h=document.getElementById('fHora').value,dur=document.getElementById('fDur').value||60,id=document.getElementById('fId').value;const box=document.getElementById('conflito'),btn=document.getElementById('btnSalvar');
- const lv=d?livres(d,dur):[];const links=lv.map(x=>`<a href="#" onclick="document.getElementById('fHora').value='${x}';checar();return false" style="color:var(--gold2);font-weight:600">${x}</a>`).join(' · ')||'<i>nenhum</i>';
- if(!d||!h){box.innerHTML=d?`<div class="alert warn">Livres em ${fmtD(d)}: ${links}</div>`:'';btn.disabled=false;btn.style.opacity=1;return}
+ const lv=d?livres(d,dur):[];const links=lv.length?`<div class="chips">${lv.map(x=>`<button type="button" class="chip${x===h?' on':''}" onclick="document.getElementById('fHora').value='${x}';checar()">${x}</button>`).join('')}</div>`:'<i>nenhum horário livre</i>';
+ if(!d||!h){box.innerHTML=d?`<div class="alert warn"><b>Toque em um horário livre</b> · ${fmtD(d)} · ${dur} min${links}</div>`:'';btn.disabled=false;btn.style.opacity=1;return}
  const c=conflitos(d,h,dur,id);const fora=toMin(h)<toMin(S.cfg.ini)||toMin(h)+num(dur)>toMin(S.cfg.fim);
- if(c.length){box.innerHTML=`<div class="alert bad">⛔ <b>Horário ocupado</b> — bate com ${c.map(a=>`${a.nome} (${a.hora}–${fromMin(fim(a))})`).join(', ')}.<br>Livres: ${links}</div>`;btn.disabled=true;btn.style.opacity=.4}
+ if(c.length){box.innerHTML=`<div class="alert bad">⛔ <b>Horário ocupado</b> — bate com ${c.map(a=>`${a.nome} (${a.hora}–${fromMin(fim(a))})`).join(', ')}.<br>Escolha outro:${links}</div>`;btn.disabled=true;btn.style.opacity=.4}
  else{box.innerHTML=fora?`<div class="alert warn">Fora do horário de trabalho (${S.cfg.ini}–${S.cfg.fim}). Ainda assim, é possível salvar.</div>`:`<div class="alert ok">✓ Livre (${h}–${fromMin(toMin(h)+num(dur))})</div>`;btn.disabled=false;btn.style.opacity=1}}
 function salvar(){const g=i=>document.getElementById(i).value;const nome=g('fNome').trim();if(!nome||!g('fData')||!g('fHora'))return alert('Preencha o nome da cliente, a data e a hora.');if(avisosCli(nome,g('fTel')).includes('alert bad')&&!confirm('Há um aviso sobre nome/telefone repetido. Salvar mesmo assim?'))return;const id=g('fId')||Date.now().toString(36);if(conflitos(g('fData'),g('fHora'),g('fDur'),id).length)return;
  const old=S.apts.find(x=>x.id===id)||{};const si=g('fServ');const a=Object.assign({},old,{id,nome,tel:g('fTel').trim(),data:g('fData'),hora:g('fHora'),dur:num(g('fDur'))||60,servIdx:si===''||si==='outro'?null:+si,serv:si===''||si==='outro'?'Outro':servNome(S.serv[+si]),val:g('fVal'),ped:g('fPed').trim(),st:g('fSt'),pac:g('fPac')==='1',sinal:g('fSinal'),sinalV:g('fSinalV')});
