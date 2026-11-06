@@ -84,7 +84,7 @@ table{width:100%;border-collapse:collapse;font-size:.86rem}th{font-size:.66rem;l
 @media(max-width:860px){.app{grid-template-columns:minmax(0,1fr)}aside{display:none}main{padding:12px;padding-bottom:96px;min-width:0;max-width:100vw;overflow-x:hidden}
 html,body{overflow-x:hidden}
 .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:10px 12px}.kpi .v{font-size:1.5rem}
-header{gap:8px;display:flex;flex-wrap:wrap;align-items:center}header h1{font-size:1.15rem;line-height:1.1;flex:1 1 55%}header h1 em{font-size:1.3rem;display:block}#hdrData{display:none}
+header{gap:6px;display:flex;flex-wrap:wrap;align-items:center}header h1{font-size:1.15rem;line-height:1.1;flex:1 1 100%}header .search{flex:1 1 120px;min-width:0!important;max-width:none}#btnTema{padding:8px 9px;font-size:.85rem;white-space:nowrap}#nvRefresh{width:40px!important;height:40px!important;flex-basis:40px!important}#bxBtn{width:42px;height:42px;flex-basis:42px}header h1 em{font-size:1.3rem;display:block}#hdrData{display:none}
 .seg{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}.seg::-webkit-scrollbar{display:none}.seg button{white-space:nowrap;padding:10px 12px;font-size:.95rem}
 .btn{min-height:40px}input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!important;min-height:40px}input[type=checkbox],input[type=radio]{width:18px;height:18px;accent-color:var(--gold)}
 table{display:block;overflow-x:auto;max-width:100%}
@@ -715,6 +715,19 @@ function montarUI(){
   <h3 style="font-family:Cinzel,serif;font-size:.72rem;letter-spacing:.18em;margin:14px 0 2px">Conexão</h3>
   <div id="nvForm"><div ${CFGW.SUPABASE_URL?"hidden":""}><label>URL do projeto (Supabase)</label><input id="nvUrl" placeholder="https://xxxx.supabase.co" value="${esc(NV.url)}"><label>Chave pública (anon)</label><input id="nvKey" placeholder="eyJ…" value="${esc(NV.key)}"></div><div class="row"><div style="flex:1"><label>E-mail</label><input id="nvEmail" value="${esc(NV.email)}"></div><div style="flex:1"><label>Senha</label><input id="nvPass" type="password"></div></div><button class="btn p" style="margin-top:8px" onclick="NUVEM.entrar()">Entrar</button><div id="nvMsg" class="mut" style="margin-top:6px;font-size:.9rem"></div></div>
   <div id="nvOn" hidden><div class="alert ok">✓ Conectada como <b id="nvQuem"></b></div><div class="row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><button class="btn s" onclick="NUVEM.publicar(true)">Publicar horários e tabela agora</button><button class="btn s d" onclick="NUVEM.sair()">Sair</button></div><div id="nvMsg2" class="mut" style="margin-top:6px;font-size:.9rem"></div></div>
+  <h3 style="font-family:Cinzel,serif;font-size:.72rem;letter-spacing:.18em;margin:14px 0 2px">📲 Mensagens automáticas para as clientes</h3>
+  <p class="mut" style="font-size:.85rem;margin:2px 0 6px">Pela API oficial do WhatsApp (Meta). Só funciona depois de configurada no Supabase (ver README). Enquanto estiver desligado, nada é enviado — os botões manuais continuam valendo.</p>
+  <div id="waCfg">${(()=>{const w=S.cfg.wa=Object.assign({ativo:false,confirmacao:true,lembrete:true,lembrete_h:24,sinal:true,sinal_dias:3,cancelamento:true,janela_ini:'08:00',janela_fim:'21:00'},S.cfg.wa||{});const ck=(k,t)=>`<label style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" ${w[k]?'checked':''} onchange="NUVEM.wa('${k}',this.checked)"> ${t}</label>`;return `
+  <label style="display:flex;gap:8px;align-items:center;margin-top:6px;font-weight:600"><input type="checkbox" ${w.ativo?'checked':''} onchange="NUVEM.wa('ativo',this.checked)"> Ligar disparos automáticos</label>
+  ${ck('confirmacao','Confirmação assim que o horário entra na agenda')}
+  ${ck('lembrete','Lembrete antes do horário, com botões <i>Confirmo / Preciso remarcar</i>')}
+  <div class="row" style="gap:6px;margin-left:26px"><div style="flex:1"><label>Lembrar quantas horas antes</label><input type="number" min="1" max="72" value="${w.lembrete_h}" onchange="NUVEM.wa('lembrete_h',+this.value||24)"></div></div>
+  ${ck('sinal','Cobrar sinal pendente (a cada 48h)')}
+  <div class="row" style="gap:6px;margin-left:26px"><div style="flex:1"><label>Até quantos dias antes</label><input type="number" min="1" max="14" value="${w.sinal_dias}" onchange="NUVEM.wa('sinal_dias',+this.value||3)"></div></div>
+  ${ck('cancelamento','Avisar cancelamento por motivo meu')}
+  <div class="row" style="gap:6px"><div style="flex:1"><label>Enviar só entre</label><input type="time" value="${w.janela_ini}" onchange="NUVEM.wa('janela_ini',this.value)"></div><div style="flex:1"><label>e</label><input type="time" value="${w.janela_fim}" onchange="NUVEM.wa('janela_fim',this.value)"></div></div>
+  <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn s" onclick="NUVEM.waPrev()">Ver prévia das mensagens</button><button class="btn s" onclick="NUVEM.waLog()">Histórico de envios</button><button class="btn s p" onclick="NUVEM.waAgora()">Disparar agora</button></div>
+  <div id="waOut" class="mut" style="margin-top:6px;font-size:.88rem;white-space:pre-wrap"></div>`})()}</div>
   <h3 style="font-family:Cinzel,serif;font-size:.72rem;letter-spacing:.18em;margin:14px 0 2px">Backup</h3>
   <p class="mut" style="font-size:.88rem;margin:2px 0 6px">A cada alteração a agenda é copiada para a nuvem automaticamente (quando conectada). Você também pode guardar um arquivo no aparelho.</p>
   <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn s p" onclick="NUVEM.baixar()">⬇ Baixar backup (arquivo)</button><label class="btn s" style="cursor:pointer">⬆ Restaurar de arquivo<input type="file" accept=".json" hidden onchange="NUVEM.restaurarArq(event)"></label><button class="btn s" onclick="NUVEM.backup(true)">☁ Enviar para a nuvem agora</button><button class="btn s" onclick="NUVEM.restaurar()">☁ Restaurar da nuvem</button></div>
@@ -753,6 +766,39 @@ function dias(){S.cfg.dias=[...document.querySelectorAll('#nvDias input:checked'
 function fecharData(){const v=document.getElementById('nvFechar').value;if(!v)return;S.cfg.fechados=[...new Set([...(S.cfg.fechados||[]),v])].sort();persist();listaFechados()}
 function abrirData(v){S.cfg.fechados=(S.cfg.fechados||[]).filter(x=>x!==v);persist();listaFechados()}
 function listaFechados(){const e=document.getElementById('nvFechados');if(!e)return;const hoje=new Date().toISOString().slice(0,10);const l=(S.cfg.fechados||[]).filter(x=>x>=hoje);e.innerHTML=l.length?'Fechados: '+l.map(x=>`<span class="tag">${x.split('-').reverse().join('/')} <a href="#" onclick="NUVEM.abrir('${x}');return false" title="reabrir">×</a></span>`).join(' '):'Nenhuma data fechada.'}
+function wa(k,v){S.cfg.wa[k]=v;persist();if(sb)sb.from('settings').upsert({key:'wa',value:S.cfg.wa})}
+function waPrev(){const o=document.getElementById('waOut');o.textContent=`Confirmação:
+"Olá, Ana! Seu horário de Esmaltação em gel com a Mila Ferreira ficou reservado para 07/11/2026, às 14:30 (valor: R$ 65,00). Se precisar alterar, é só responder esta mensagem. Até lá! 💅"
+
+Lembrete (${S.cfg.wa.lembrete_h}h antes) — botões Confirmo / Preciso remarcar:
+"Oi, Ana! Passando para lembrar do seu horário de Esmaltação em gel amanhã, 07/11/2026, às 14:30, com a Mila Ferreira. Pode confirmar sua presença?"
+
+Sinal pendente:
+"Oi, Ana! Para garantir seu horário de 07/11/2026, às 14:30, falta o sinal de agendamento de R$ 19,50. Chave PIX: ${S.cfg.pix||'(sua chave)'} Depois de pagar, é só me mandar o comprovante aqui. Obrigada! 💛"
+
+Cancelamento por motivo meu:
+"Oi, Ana. Preciso cancelar o seu horário de 07/11/2026, às 14:30 por um motivo meu — me desculpe pelo transtorno. Seu sinal fica como crédito para a próxima vez. Me responde aqui que eu já te encaixo em um novo horário. 💛"
+
+(Os textos são modelos aprovados pela Meta; para mudar, edita-se o modelo no painel da Meta.)`}
+async function waLog(){const o=document.getElementById('waOut');if(!sb){o.textContent='Conecte a nuvem primeiro.';return}const r=await sb.from('wa_log').select('created_at,agenda_id,telefone,tipo,status,erro').order('created_at',{ascending:false}).limit(30);if(r.error){o.textContent='Tabela de histórico ainda não existe — rode o SQL novo no Supabase.';return}o.textContent=r.data.length?r.data.map(x=>{const a=S.apts.find(y=>y.id===x.agenda_id);return `${new Date(x.created_at).toLocaleString('pt-BR').slice(0,16)} · ${x.tipo} · ${a?a.nome.split(' ')[0]:x.telefone} · ${x.status}${x.erro?' · '+x.erro.slice(0,80):''}`}).join('\n'):'Nenhum envio ainda.'}
+async function waAgora(){const o=document.getElementById('waOut');o.textContent='Disparando…';try{const r=await fetch(NV.url+'/functions/v1/wa-disparos?agora=1',{headers:{Authorization:'Bearer '+NV.key}});o.textContent=await r.text()}catch(e){o.textContent='Não consegui chamar a função (ela já foi publicada no Supabase?).'}}
+function waEventos(){if(!sb)return;sb.channel('wa-ev').on('postgres_changes',{event:'INSERT',schema:'public',table:'wa_eventos'},p=>aplicarEvento(p.new)).subscribe();sb.from('wa_eventos').select('*').eq('lido',false).then(r=>{(r.data||[]).forEach(aplicarEvento)})}
+async function aplicarEvento(ev){const a=S.apts.find(x=>x.id===ev.agenda_id)||S.apts.filter(x=>ativos(x)&&(x.tel||'').replace(/\D/g,'').slice(-8)===String(ev.telefone).slice(-8)&&x.data>=iso(new Date())).sort((p,q)=>(p.data+p.hora).localeCompare(q.data+q.hora))[0];
+ if(a){if(ev.evento==='confirmou'&&a.st==='ag'){a.st='conf';a.waOk=true;persist()}else if(ev.evento==='remarcar'){a.waRemarcar=true;persist()}}
+ const nome=a?a.nome.split(' ')[0]:ev.telefone;const txt=ev.evento==='confirmou'?`✅ ${nome} confirmou pelo WhatsApp`:ev.evento==='remarcar'?`🔁 ${nome} pediu para remarcar — abra a ficha`:`💬 ${nome}: "${(ev.texto||'').slice(0,80)}"`;
+ let b=document.getElementById('waBanner');if(!b){b=document.createElement('div');b.id='waBanner';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:2900;background:var(--card,#fff);color:var(--ink,#111);border:1px solid var(--gold,#b8923a);border-radius:14px;padding:10px 14px;font-size:.92rem;box-shadow:0 8px 24px #0005;max-width:92vw';document.body.appendChild(b)}b.textContent=txt;b.hidden=false;setTimeout(()=>{b.hidden=true},8000);
+ await sb.from('wa_eventos').update({lido:true}).eq('id',ev.id);try{render();if(window.BRUXA)BRUXA.badge()}catch(e){}}
+// ---- Atualizar (botão no cabeçalho + puxar para baixo + ao voltar para o app) ----
+async function sincronizar(ui){const b=document.getElementById('nvRefresh');if(b){b.classList.add('spin')}try{if(sb&&window.NUVEM_LOGADA){await puxar();await carregarNovos()}try{render();if(window.BRUXA)BRUXA.badge()}catch(e){}if(ui)sinc('Atualizada '+new Date().toLocaleTimeString('pt-BR').slice(0,5))}finally{setTimeout(()=>b&&b.classList.remove('spin'),600)}}
+function montarRefresh(){if(document.getElementById('nvRefresh'))return;const h=document.querySelector('header');if(!h)return;const b=document.createElement('button');b.id='nvRefresh';b.title='Atualizar';b.innerHTML='↻';b.onclick=()=>sincronizar(true);
+ b.style.cssText='width:44px;height:44px;border-radius:50%;border:1px solid var(--gold,#b8923a);background:var(--card,#fff);color:var(--gold2,#8a6a1f);font-size:1.4rem;cursor:pointer;display:grid;place-items:center;flex:0 0 44px';const st=document.createElement('style');st.textContent='#nvRefresh.spin{animation:nvSpin .6s linear infinite}@keyframes nvSpin{to{transform:rotate(360deg)}}#nvPull{position:fixed;top:0;left:0;right:0;text-align:center;font-size:.8rem;letter-spacing:.1em;color:var(--gold2,#8a6a1f);padding:6px;transform:translateY(-100%);transition:transform .2s;z-index:800;background:var(--bg,#f6f1e7)}#nvPull.on{transform:translateY(env(safe-area-inset-top,0px))}';document.head.appendChild(st);
+ const tema=h.querySelector('#tema,[onclick*="tema"],[onclick*="Tema"]');if(tema&&tema.parentNode===h)h.insertBefore(b,tema.nextSibling);else h.appendChild(b);
+ // puxar para baixo (quando aberto como app, o navegador não faz isso sozinho)
+ const pull=document.createElement('div');pull.id='nvPull';pull.textContent='↓ solte para atualizar';document.body.appendChild(pull);let y0=null,arm=false;
+ document.addEventListener('touchstart',e=>{y0=window.scrollY<=0?e.touches[0].clientY:null;arm=false},{passive:true});
+ document.addEventListener('touchmove',e=>{if(y0===null)return;const d=e.touches[0].clientY-y0;arm=d>90;pull.classList.toggle('on',d>40)},{passive:true});
+ document.addEventListener('touchend',()=>{pull.classList.remove('on');if(arm)sincronizar(true);y0=null;arm=false});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sincronizar(false)});}
 function msg(t,id){const e=document.getElementById(id||'nvMsg');if(e)e.textContent=t}
 
 // ---- Conexão ----
@@ -764,7 +810,7 @@ async function conectar(){
  if(!session){if(NV.pass&&NV.email&&!window.__nvAuto){window.__nvAuto=true;const r=await sb.auth.signInWithPassword({email:NV.email,password:atob(NV.pass)});if(!r.error)return conectar()}if(CFGW.SUPABASE_URL&&!sessionStorage.getItem('nv-offline'))loginTela();return false}
  await puxar();
  document.getElementById('nvForm').hidden=true;document.getElementById('nvOn').hidden=false;document.getElementById('nvQuem').textContent=session.user.email;
- await carregarNovos();escutar();publicar(false);window.NUVEM_LOGADA=true;return true;
+ await carregarNovos();escutar();publicar(false);window.NUVEM_LOGADA=true;waEventos();return true;
 }
 // ---- Tempo real da agenda inteira (qualquer aparelho vê tudo) ----
 async function puxar(){const r=await sb.from('backups').select('payload,updated_at').eq('id','agenda').maybeSingle();if(r.error||!r.data)return;const t=new Date(r.data.updated_at).getTime();const loc=+(localStorage.getItem('nv-ts')||0);if(t>loc)aplicar(r.data.payload,t)}
@@ -802,7 +848,22 @@ async function marcarImportado(agendaId){
  const id=window.NUVEM_IMPORT;if(!id||!sb)return;window.NUVEM_IMPORT=null;
  await sb.from('bookings').update({status:'importado',agenda_id:agendaId}).eq('id',id);NOVOS=NOVOS.filter(n=>n.id!==id);banner();
 }
-async function recusar(id){if(!confirm('Recusar este pedido? A cliente não é avisada automaticamente — fale com ela pelo WhatsApp.'))return;await sb.from('bookings').update({status:'recusado'}).eq('id',id);NOVOS=NOVOS.filter(n=>n.id!==id);banner()}
+const RECUSA={ocupado:'esse horário acabou de ser preenchido',servico:'no momento não estou atendendo esse serviço',fora:'esse dia/horário está fora da minha agenda de atendimento',outro:''};
+function recusar(id){const x=NOVOS.find(n=>n.id===id);if(!x)return;const fd=s=>String(s).split('-').reverse().join('/');
+ let m=document.getElementById('nvRec');if(m)m.remove();m=document.createElement('div');m.id='nvRec';m.style.cssText='position:fixed;inset:0;z-index:2500;background:rgba(20,15,10,.55);display:flex;align-items:flex-end;justify-content:center';
+ m.innerHTML=`<div class="card" style="width:100%;max-width:560px;border-radius:20px 20px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom))"><h2>Recusar pedido de ${esc(x.nome.split(' ')[0])}</h2>
+ <p class="mut" style="font-size:.9rem">${esc(x.servico)} · ${fd(x.data)} às ${String(x.hora).slice(0,5)}</p>
+ <label>Motivo (vai na mensagem)</label><select id="recMot" onchange="NUVEM.recPrev('${id}')"><option value="ocupado">Horário já foi preenchido</option><option value="servico">Não atendo esse serviço no momento</option><option value="fora">Fora do meu horário de atendimento</option><option value="outro">Outro (escrever)</option></select>
+ <label>Mensagem para a cliente</label><textarea id="recTxt" rows="7"></textarea>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" id="recSug" checked onchange="NUVEM.recPrev('${id}')"> Sugerir que ela escolha outro horário pelo site</label>
+ <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn p" onclick="NUVEM.recEnviar('${id}')">📲 Recusar e avisar pelo WhatsApp</button><button class="btn s" onclick="NUVEM.recEnviar('${id}',true)">Recusar sem avisar</button><button class="btn s" onclick="document.getElementById('nvRec').remove()">Cancelar</button></div></div>`;
+ document.body.appendChild(m);recPrev(id)}
+function recPrev(id){const x=NOVOS.find(n=>n.id===id);if(!x)return;const fd=s=>String(s).split('-').reverse().join('/');const mot=document.getElementById('recMot').value;const nome=x.apelido||x.nome.split(' ')[0];const sug=document.getElementById('recSug').checked;
+ const frase=mot==='outro'?'':RECUSA[mot];const link=location.protocol.startsWith('http')?location.href.replace(/agenda\.html.*$/,''):'';
+ document.getElementById('recTxt').value=`Oi, ${nome}! Obrigada pelo seu pedido de ${x.servico} para ${fd(x.data)}, às ${String(x.hora).slice(0,5)}.\nInfelizmente não vou conseguir te atender nesse horário${frase?' — '+frase:''}.${sug?'\nSe quiser, escolha outro horário livre pelo site'+(link?': '+link:'')+' ou me diga aqui qual dia fica bom para você.':''}\nDesculpe o transtorno e até breve! 💛`}
+async function recEnviar(id,semAviso){const x=NOVOS.find(n=>n.id===id);if(!x)return;const mot=document.getElementById('recMot').value,txt=document.getElementById('recTxt').value;
+ await sb.from('bookings').update({status:'recusado',pedidos:((x.pedidos||'')+'\n[recusado: '+mot+']').trim()}).eq('id',id);NOVOS=NOVOS.filter(n=>n.id!==id);banner();document.getElementById('nvRec')?.remove();
+ if(!semAviso){const t=String(x.telefone).replace(/\D/g,'');window.open(`https://wa.me/${t.length<=11?'55'+t:t}?text=${encodeURIComponent(txt)}`,'_blank')}}
 
 // ---- Publicar ocupados + tabela + config (o que a página pública lê) ----
 let pubTimer=null;
@@ -827,14 +888,14 @@ async function restaurar(){if(!confirm('Substituir a agenda deste aparelho pelo 
 const _salvar=window.salvar;
 if(_salvar)window.salvar=function(){const antes=S.apts.length;const ids=new Set(S.apts.map(a=>a.id));_salvar.apply(this,arguments);if(window.NUVEM_IMPORT){const nov=S.apts.find(a=>!ids.has(a.id));if(nov)marcarImportado(nov.id);const av=document.getElementById('nvAviso');if(av)av.remove()}};
 
-window.NUVEM={entrar,sair,importar,recusar,publicar,backup,restaurar,baixar,restaurarArq,login,offline,dias,fechar:fecharData,abrir:abrirData,esqueci,salvarSenha,olho};
+window.NUVEM={entrar,sair,importar,recusar,publicar,backup,restaurar,baixar,restaurarArq,login,offline,dias,fechar:fecharData,abrir:abrirData,esqueci,salvarSenha,olho,wa,waPrev,waLog,waAgora,recPrev,recEnviar,sincronizar};
 // ---- Atualização automática do app (quando aberto pelo link / ícone) ----
 if(location.protocol.startsWith('http')){let etag=null;const checa=async()=>{try{const r=await fetch(location.pathname+'?v='+Date.now(),{method:'HEAD',cache:'no-store'});const t=r.headers.get('etag')||r.headers.get('last-modified');if(!t)return;if(etag&&t!==etag){let b=document.getElementById('nvUpd');if(!b){b=document.createElement('div');b.id='nvUpd';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:3000;background:var(--black,#141210);color:#f3e6c4;border:1px solid var(--gold,#b8923a);border-radius:999px;padding:8px 14px;font-size:.9rem;box-shadow:0 8px 24px #0006;cursor:pointer';b.textContent='✨ Nova versão disponível — toque para atualizar';b.onclick=()=>location.reload(true);document.body.appendChild(b)}}etag=t}catch(e){}};checa();setInterval(checa,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checa()})}
 window.NUVEM_NOVOS=()=>NOVOS;window.NUVEM_ON=()=>!!(sb&&window.NUVEM_LOGADA);
 window.NUVEM_BRUXA=async cfg=>{if(sb)await sb.from('settings').upsert({key:'bruxa',value:cfg})};
 window.NUVEM_INVOCAR=async()=>{try{const r=await fetch(NV.url+'/functions/v1/bruxa?agora=1',{headers:{Authorization:'Bearer '+NV.key}});return r.ok}catch(e){return false}};
-document.addEventListener('DOMContentLoaded',()=>{montarUI();listaFechados();conectar()});
-if(document.readyState!=='loading'){montarUI();listaFechados();conectar()}
+document.addEventListener('DOMContentLoaded',()=>{montarUI();montarRefresh();listaFechados();conectar()});
+if(document.readyState!=='loading'){montarUI();montarRefresh();listaFechados();conectar()}
 })();
 
 </script>
